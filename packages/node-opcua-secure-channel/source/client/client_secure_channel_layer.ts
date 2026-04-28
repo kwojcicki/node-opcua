@@ -1352,7 +1352,11 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
             this.#_on_transport_closed(new Error("Connection Break"));
         });
 
-        setImmediate(() => {
+        // `setImmediate` is Node-only; fall back to a queued microtask in browsers.
+        const scheduleNext = typeof setImmediate === "function"
+            ? setImmediate
+            : (cb: () => void) => Promise.resolve().then(cb);
+        scheduleNext(() => {
             doDebug && debugLog(chalk.red("Client now sending OpenSecureChannel"));
             const isInitial = true;
             this.#_send_open_secure_channel_request(isInitial, callback);
