@@ -15,7 +15,14 @@ function myCreatePrivateKey(rawKey: string | Buffer): any {
 }
 
 export async function testRSAPKCS1V15_EncryptDecrypt() {
-
+    // Skip on non-Node runtimes (browser / Deno / etc.). This diagnostic
+    // only makes sense for Node versions in the narrow range affected by
+    // CVE-2023-46809; in the browser `process.version` is an empty string
+    // under the standard `process` polyfill and the regex below would
+    // throw, breaking module load for every downstream consumer.
+    if (typeof process === "undefined" || !process.version) {
+        return;
+    }
     const version = process.version.match(/v([0-9]+)\.([0-9]+)\.([0-9]+)/);
     if (!version) {
         throw new Error("Invalid version");
