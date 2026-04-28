@@ -25,7 +25,9 @@
  */
 export * from "./AcknowledgeMessage";
 export * from "./client_tcp_transport";
+export * from "./default_client_transport_factory";
 export * from "./HelloMessage";
+export * from "./i_client_transport";
 export * from "./i_hello_ack_limits";
 export * from "./message_builder_base";
 export * from "./server_tcp_transport";
