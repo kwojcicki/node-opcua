@@ -91,9 +91,8 @@ export function exploreNode(node: BaseNode) {
 //              |
 //              +-------------------------------|- EnabledState    <
 //
-// find also child object with the same browse name that are
-// overridden in the SuperType
-
+// find also child object with the same browse name that is overridden in the SuperType
+//
 // case 2:
 //
 //   /-----------------------------\
@@ -116,7 +115,7 @@ export function exploreNode(node: BaseNode) {
 //              |                     |
 //              |                     +--------------|- (EnabledState)
 //
-// find also child object with the same browse name that are
+// find also child object with the same browse name that is overridden in the same child of the SuperType
 
 function _get_parent_type_and_path(originalObject: BaseNode): {
     parentType: null | UAVariableType | UAObjectType;
@@ -125,13 +124,29 @@ function _get_parent_type_and_path(originalObject: BaseNode): {
     if (originalObject.nodeClass === NodeClass.Method) {
         return { parentType: null, path: [] };
     }
-
     const addressSpace = originalObject.addressSpace;
-
     const parents = originalObject.findReferencesEx("HasChild", BrowseDirection.Inverse);
     // c8 ignore next
     if (parents.length > 1) {
-        warningLog(" object ", originalObject.browseName.toString(), " has more than one parent !");
+
+        // it could be a tricky buggy situation  like that we have seen with SIOME
+        //  
+        //  AnalogUnitTyoe
+        //    |-- HasProperty --> EngineeringUnits (i=17052)
+        //  MyObjectType
+        //    |-- HasComponent --> ActualSpeed
+        //                              |-- HasComponent --> EngineeringUnits (i=17052) <== BUGGY !!!
+
+        const parentTypes = parents.filter((p) => {
+            const n = addressSpace.findNode(p.nodeId);
+            return n && (n.nodeClass === NodeClass.ObjectType || n.nodeClass === NodeClass.VariableType);
+        });
+        
+        if (parentTypes.length === 1) {
+            return { parentType: addressSpace.findNode(parentTypes[0].nodeId) as UAObjectType | UAVariableType, path: [originalObject.browseName] };
+        }
+
+        warningLog(" object ", originalObject.browseName.toString(), originalObject.nodeId.toString(), " has more than one parent !");
         warningLog(originalObject.toString());
         warningLog(" parents : ");
         for (const parent of parents) {

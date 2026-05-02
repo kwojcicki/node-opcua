@@ -2,7 +2,7 @@
  * @module node-opcua-client-proxy
  */
 // tslint:disable:no-shadowed-variable
-import { EventEmitter } from "stream";
+import { EventEmitter } from "events";
 import { assert } from "node-opcua-assert";
 
 import { AttributeIds, NodeClass, coerceAccessLevelFlag } from "node-opcua-data-model";
