@@ -172,6 +172,24 @@ export function getPartialCertificateChain(certificateChain?: Certificate | Cert
 export interface IOPCUASecureObjectOptions {
     certificateFile?: string;
     privateKeyFile?: string;
+    /**
+     * Optional pre-built certificate + private-key provider. When supplied,
+     * `OPCUASecureObject.getCertificate()` / `.getCertificateChain()` /
+     * `.getPrivateKey()` delegate to this object verbatim, and the disk-backed
+     * `SecretHolder` path (`fs.existsSync` + `readCertificateChain` +
+     * `readPrivateKey`) is not used.
+     *
+     * Intended for browser builds (bundled via esbuild) and test fixtures that
+     * want to stage a cert+key pair without staging PKI folders on disk. A
+     * caller that wants in-memory semantics simply passes an implementation of
+     * {@link ICertificateKeyPairProvider} whose methods return values from
+     * memory.
+     *
+     * When present, `certificateFile` / `privateKeyFile` become optional and
+     * may be omitted (internal placeholders are used for toJSON output).
+     * When absent, those two fields remain required strings.
+     */
+    certificateKeyPairProvider?: ICertificateKeyPairProvider;
 }
 
 /**
@@ -187,24 +205,39 @@ export class OPCUASecureObject<T extends Record<string | symbol, any> = any>
 {
     public readonly certificateFile: string;
     public readonly privateKeyFile: string;
+    readonly #certificateKeyPairProvider?: ICertificateKeyPairProvider;
 
     constructor(options: IOPCUASecureObjectOptions) {
         super();
-        assert(typeof options.certificateFile === "string");
-        assert(typeof options.privateKeyFile === "string");
-        this.certificateFile = options.certificateFile || "invalid certificate file";
-        this.privateKeyFile = options.privateKeyFile || "invalid private key file";
+        if (options.certificateKeyPairProvider) {
+            // When a provider is supplied, the file paths become diagnostic
+            // placeholders only — `SecretHolder` is never consulted.
+            this.certificateFile = options.certificateFile ?? "<in-memory>";
+            this.privateKeyFile = options.privateKeyFile ?? "<in-memory>";
+            this.#certificateKeyPairProvider = options.certificateKeyPairProvider;
+        } else {
+            assert(typeof options.certificateFile === "string");
+            assert(typeof options.privateKeyFile === "string");
+            this.certificateFile = options.certificateFile || "invalid certificate file";
+            this.privateKeyFile = options.privateKeyFile || "invalid private key file";
+        }
     }
 
     public getCertificate(): Certificate {
-        return getSecretHolder(this).getCertificate();
+        return this.#certificateKeyPairProvider
+            ? this.#certificateKeyPairProvider.getCertificate()
+            : getSecretHolder(this).getCertificate();
     }
 
     public getCertificateChain(): Certificate[] {
-        return getSecretHolder(this).getCertificateChain();
+        return this.#certificateKeyPairProvider
+            ? this.#certificateKeyPairProvider.getCertificateChain()
+            : getSecretHolder(this).getCertificateChain();
     }
 
     public getPrivateKey(): PrivateKey {
-        return getSecretHolder(this).getPrivateKey();
+        return this.#certificateKeyPairProvider
+            ? this.#certificateKeyPairProvider.getPrivateKey()
+            : getSecretHolder(this).getPrivateKey();
     }
 }
