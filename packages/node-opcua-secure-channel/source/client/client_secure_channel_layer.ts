@@ -33,7 +33,13 @@ import {
 } from "node-opcua-service-secure-channel";
 import type { ErrorCallback } from "node-opcua-status-code";
 import { type CallbackT, type StatusCode, StatusCodes } from "node-opcua-status-code";
-import { ClientTCP_transport, doTraceChunk, type TransportSettingsOptions } from "node-opcua-transport";
+import {
+    defaultClientTransportFactory,
+    doTraceChunk,
+    type IClientTransport,
+    type IClientTransportFactory,
+    type TransportSettingsOptions
+} from "node-opcua-transport";
 import { get_clock_tick, timestamp } from "node-opcua-utils";
 import {
     extractFirstCertificateInChain,
@@ -259,6 +265,8 @@ export interface ClientSecureChannelLayerOptions {
     connectionStrategy?: ConnectionStrategyOptions;
 
     transportSettings?: TransportSettingsOptions;
+
+    transportFactory?: IClientTransportFactory;
 }
 
 export interface ClientSecureChannelLayerEvents {
@@ -377,6 +385,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
     }
 
     #requestedTransportSettings: TransportSettingsOptions;
+    #transportFactory: IClientTransportFactory;
 
     public protocolVersion: number;
     public readonly securityMode: MessageSecurityMode;
@@ -386,8 +395,8 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
     public activeSecurityToken: ChannelSecurityToken | null;
 
     #_lastRequestId: number;
-    #_transport?: ClientTCP_transport;
-    #_pending_transport?: ClientTCP_transport;
+    #_transport?: IClientTransport;
+    #_pending_transport?: IClientTransport;
     readonly #parent?: ClientSecureChannelParent;
 
     readonly #messageChunker: MessageChunker;
@@ -459,6 +468,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
         this.#_securityTokenTimeoutId = null;
         this.#transportTimeout = options.transportTimeout || ClientSecureChannelLayer.defaultTransportTimeout;
         this.#requestedTransportSettings = options.transportSettings || {};
+        this.#transportFactory = options.transportFactory || defaultClientTransportFactory;
         this.#connectionStrategy = coerceConnectionStrategy(options.connectionStrategy);
         this.channelId = 0;
     }
@@ -595,11 +605,11 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
 
         this.endpointUrl = endpointUrl;
 
-        const transport = new ClientTCP_transport(this.#requestedTransportSettings);
+        const transport = this.#transportFactory.create(this.#requestedTransportSettings);
         transport.timeout = this.#transportTimeout;
 
         doDebug &&
-            debugLog("ClientSecureChannelLayer#create creating ClientTCP_transport with  transport.timeout = ", transport.timeout);
+            debugLog("ClientSecureChannelLayer#create creating transport with  transport.timeout = ", transport.timeout);
         assert(!this.#_pending_transport);
         this.#_pending_transport = transport;
         this.#_establish_connection(transport, endpointUrl, (err?: Error | null) => {
@@ -814,7 +824,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
     /**
      * @private internal use only : (used for test)
      */
-    getTransport(): ClientTCP_transport | undefined {
+    getTransport(): IClientTransport | undefined {
         return this.#_transport;
     }
     /**
@@ -1329,7 +1339,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
     /**
      * install message builder and send first OpenSecureChannelRequest
      */
-    #_on_connection(transport: ClientTCP_transport, callback: ErrorCallback) {
+    #_on_connection(transport: IClientTransport, callback: ErrorCallback) {
         assert(this.#_pending_transport === transport);
         this.#_pending_transport = undefined;
         this.#_transport = transport;
@@ -1366,7 +1376,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
     #_backoff_completion(
         err: Error | undefined,
         lastError: Error | undefined,
-        transport: ClientTCP_transport,
+        transport: IClientTransport,
         callback: ErrorCallback
     ) {
         // Node 20.11.1 on windows now reports a AggregateError when a connection is refused
@@ -1401,7 +1411,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
         }
     }
 
-    #_connect(transport: ClientTCP_transport, endpointUrl: string, _i_callback: ErrorCallback) {
+    #_connect(transport: IClientTransport, endpointUrl: string, _i_callback: ErrorCallback) {
         const on_connect = (err?: Error | null) => {
             doDebug && debugLog("Connection => err", err ? err.message : "null");
             // force Backoff to fail if err is not ECONNRESET or ECONNREFUSED
@@ -1454,7 +1464,7 @@ export class ClientSecureChannelLayer extends EventEmitter<ClientSecureChannelLa
         transport.connect(endpointUrl, on_connect);
     }
 
-    #_establish_connection(transport: ClientTCP_transport, endpointUrl: string, callback: ErrorCallback) {
+    #_establish_connection(transport: IClientTransport, endpointUrl: string, callback: ErrorCallback) {
         transport.protocolVersion = this.protocolVersion;
 
         this.#lastError = undefined;
