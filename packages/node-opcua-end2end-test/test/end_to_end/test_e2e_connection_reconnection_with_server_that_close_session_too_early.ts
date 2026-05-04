@@ -6,6 +6,7 @@ import {
     type ClientMonitoredItem,
     type ClientSession,
     ClientSubscription,
+    ClientTCP_transport,
     type ConnectionStrategyOptions,
     coerceNodeId,
     DataType,
@@ -79,9 +80,12 @@ async function break_connection(theClient: OPCUAClient, socketError: string): Pr
     const r = await session.call(methodToCall);
     debugLog(r.toString());
 
-    // Brutally destroy underlying socket to emulate abrupt network failure
+    // Brutally destroy underlying socket to emulate abrupt network failure.
+    // `getTransport()` now returns `IClientTransport | undefined`; here we know
+    // we built the client with the default factory so the concrete type is
+    // `ClientTCP_transport` and `._socket` is available.
     const secureChannel = (theClient as OPCUAClientImpl)._secureChannel; // internal
-    const transport = secureChannel?.getTransport();
+    const transport = secureChannel?.getTransport() as ClientTCP_transport | undefined;
     const clientSocket = transport?._socket;
     clientSocket?.end();
     clientSocket?.destroy();
