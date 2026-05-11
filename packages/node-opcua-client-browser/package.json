@@ -1,0 +1,53 @@
+{
+    "name": "node-opcua-client-browser",
+    "version": "2.170.1",
+    "description": "OPC UA SDK - browser WebSocket client (opc.ws / opc.wss)",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "browser": "./dist-esm/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "browser": "./dist-esm/index.js",
+            "import": "./dist-esm/index.js",
+            "require": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "sideEffects": false,
+    "scripts": {
+        "build": "tsc -b && tsc -p tsconfig.esm.json",
+        "build:test-page": "node build-test-page.mjs",
+        "lint": "eslint source test",
+        "test:e2e": "playwright test",
+        "test": "pnpm test:e2e",
+        "test:check": "tsc --noEmit -p test/tsconfig.json",
+        "clean": "npx rimraf -g node_modules dist dist-esm test/page/dist *.tsbuildinfo test-results playwright-report"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@playwright/test": "^1.49.0",
+        "esbuild": "^0.25.0"
+    },
+    "author": "Sterfive SAS",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/node-opcua/node-opcua.git"
+    },
+    "keywords": [
+        "OPCUA",
+        "opcua",
+        "browser",
+        "websocket",
+        "wsopc-ua",
+        "opc.ws",
+        "opc.wss"
+    ],
+    "homepage": "http://node-opcua.github.io/",
+    "files": [
+        "dist",
+        "dist-esm",
+        "source"
+    ]
+}
