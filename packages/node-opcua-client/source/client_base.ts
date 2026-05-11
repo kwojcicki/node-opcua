@@ -18,6 +18,7 @@ import type { FindServersOnNetworkRequestOptions, FindServersRequestOptions, Ser
 import type { ApplicationDescription, EndpointDescription } from "node-opcua-service-endpoints";
 import type { ChannelSecurityToken, MessageSecurityMode } from "node-opcua-service-secure-channel";
 import type { ErrorCallback } from "node-opcua-status-code";
+import type { IClientTransportFactory } from "node-opcua-transport";
 import type { Request, Response } from "./common";
 
 export type FindServersRequestLike = FindServersRequestOptions;
@@ -203,6 +204,15 @@ export interface OPCUAClientBaseOptions {
      * path resolution and uses the provider directly.
      */
     certificateKeyPairProvider?: ICertificateKeyPairProvider;
+
+    /**
+     * Optional factory for the underlying client transport. When omitted, the
+     * secure-channel layer uses `defaultClientTransportFactory` (a Node-only
+     * TCP transport). Consumers that need a different transport — browser
+     * WebSocket, in-process stub, tracing wrapper — pass a factory here and
+     * it is threaded through to `ClientSecureChannelLayer`.
+     */
+    transportFactory?: IClientTransportFactory;
 }
 
 export interface GetEndpointsOptions {

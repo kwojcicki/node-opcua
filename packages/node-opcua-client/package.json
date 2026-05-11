@@ -53,6 +53,7 @@
         "node-opcua-service-translate-browse-path": "2.170.0",
         "node-opcua-service-write": "2.170.0",
         "node-opcua-status-code": "2.169.0",
+        "node-opcua-transport": "2.170.0",
         "node-opcua-types": "2.170.0",
         "node-opcua-utils": "2.169.0",
         "node-opcua-variant": "2.170.0",
