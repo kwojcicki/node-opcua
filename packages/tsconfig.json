@@ -21,6 +21,9 @@
             "path": "node-opcua-client"
         },
         {
+            "path": "node-opcua-client-browser"
+        },
+        {
             "path": "node-opcua-server"
         },
         {
