@@ -1,0 +1,23 @@
+[ req ]
+default_bits        = 2048
+prompt              = no
+distinguished_name  = dn
+req_extensions      = v3_req
+x509_extensions     = v3_req
+
+[ dn ]
+CN = NodeOPCUA-Browser-Test-Client
+O  = Sterfive Tests
+C  = FR
+
+[ v3_req ]
+basicConstraints     = CA:FALSE
+keyUsage             = critical, digitalSignature, keyEncipherment, dataEncipherment, nonRepudiation
+extendedKeyUsage     = critical, clientAuth, serverAuth
+subjectKeyIdentifier = hash
+subjectAltName       = @alt_names
+
+[ alt_names ]
+URI = urn:NodeOPCUA-Browser-Test:Client
+DNS = localhost
+IP  = 127.0.0.1

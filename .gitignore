@@ -50,6 +50,8 @@ CTTA/
 CTT/Node-OPCUA-Client
 demo/
 dist/
+dist-browser-bundle/
+dist-esm/
 dist-test/
 distHelpers/
 distNodeJS/

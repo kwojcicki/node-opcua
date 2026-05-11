@@ -1,0 +1,94 @@
+{
+    "name": "node-opcua-client-browser",
+    "version": "2.170.1",
+    "description": "OPC UA SDK - browser WebSocket client (opc.ws / opc.wss)",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "browser": "./dist-esm/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "browser": "./dist-esm/index.js",
+            "import": "./dist-esm/index.js",
+            "require": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./browser-bundle": {
+            "types": "./dist/index.d.ts",
+            "browser": "./dist-browser-bundle/index.js",
+            "import": "./dist-browser-bundle/index.js",
+            "default": "./dist-browser-bundle/index.js"
+        }
+    },
+    "sideEffects": false,
+    "scripts": {
+        "build": "tsc -b && tsc -p tsconfig.esm.json",
+        "build:test-page": "node build-test-page.mjs",
+        "build:browser-bundle": "pnpm build && node build-browser-bundle.mjs",
+        "build:browser-bundle:min": "pnpm build && node build-browser-bundle.mjs --minify",
+        "lint": "eslint source test",
+        "test:unit": "mocha 'test/unit/**/*.ts'",
+        "test:e2e": "playwright test",
+        "test": "pnpm test:unit && pnpm test:e2e",
+        "test:check": "tsc --noEmit -p test/tsconfig.json",
+        "clean": "npx rimraf -g node_modules dist dist-esm dist-browser-bundle test/page/dist *.tsbuildinfo test-results playwright-report"
+    },
+    "dependencies": {
+        "node-opcua-assert": "2.164.0",
+        "node-opcua-client": "2.170.1",
+        "node-opcua-common": "2.170.0",
+        "node-opcua-crypto": "5.3.5",
+        "node-opcua-debug": "2.168.0",
+        "node-opcua-secure-channel": "2.170.1",
+        "node-opcua-status-code": "2.169.0",
+        "node-opcua-transport": "2.170.0"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.49.0",
+        "@types/mocha": "^10.0.10",
+        "@types/ws": "^8.5.13",
+        "assert": "^2.1.0",
+        "buffer": "^6.0.3",
+        "constants-browserify": "^1.0.0",
+        "crypto-browserify": "^3.12.1",
+        "esbuild": "^0.25.0",
+        "events": "^3.3.0",
+        "mocha": "12.0.0-beta-9.2",
+        "node-opcua": "2.170.1",
+        "node-opcua-variant": "2.170.0",
+        "process": "^0.11.10",
+        "should": "13.2.3",
+        "sinon": "^19.0.2",
+        "stream-browserify": "^3.0.0",
+        "string_decoder": "^1.3.0",
+        "util": "^0.12.5",
+        "vm-browserify": "^1.1.2",
+        "ws": "^8.18.0"
+    },
+    "author": "Sterfive SAS",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/node-opcua/node-opcua.git"
+    },
+    "keywords": [
+        "OPCUA",
+        "opcua",
+        "browser",
+        "websocket",
+        "wsopc-ua",
+        "opc.ws",
+        "opc.wss"
+    ],
+    "homepage": "http://node-opcua.github.io/",
+    "files": [
+        "dist",
+        "dist-esm",
+        "dist-browser-bundle",
+        "esbuild-shims",
+        "esbuild-config.mjs",
+        "build-browser-bundle.mjs",
+        "source"
+    ]
+}
+
