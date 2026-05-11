@@ -27,6 +27,7 @@ import {
     type Response as Response1,
     type SecurityPolicy
 } from "node-opcua-secure-channel";
+import type { IClientTransportFactory } from "node-opcua-transport";
 import {
     FindServersOnNetworkRequest,
     type FindServersOnNetworkRequestOptions,
@@ -387,6 +388,7 @@ export class ClientBaseImpl<Events extends OPCUAClientBaseEvents = OPCUAClientBa
     private _instanceNumber: number;
     private _transportSettings: TransportSettings;
     private _transportTimeout?: number;
+    private _transportFactory?: IClientTransportFactory;
 
     public clientCertificateManager: ICertificateStore;
 
@@ -513,6 +515,7 @@ export class ClientBaseImpl<Events extends OPCUAClientBaseEvents = OPCUAClientBa
 
         this._transportSettings = options.transportSettings || {};
         this._transportTimeout = options.transportTimeout;
+        this._transportFactory = options.transportFactory;
     }
 
     private _cancel_reconnection(callback: ErrorCallback) {
@@ -706,6 +709,7 @@ export class ClientBaseImpl<Events extends OPCUAClientBaseEvents = OPCUAClientBa
             tokenRenewalInterval: this.tokenRenewalInterval,
             transportSettings: this._transportSettings,
             transportTimeout: this._transportTimeout,
+            transportFactory: this._transportFactory,
             defaultTransactionTimeout: this.defaultTransactionTimeout
         });
         secureChannel.on("backoff", (count: number, delay: number) => {
