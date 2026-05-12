@@ -10,7 +10,12 @@
     "include": [
         "source/**/*.ts"
     ],
-    "references": [],
+    "references": [
+        { "path": "../node-opcua-assert" },
+        { "path": "../node-opcua-debug" },
+        { "path": "../node-opcua-status-code" },
+        { "path": "../node-opcua-transport" }
+    ],
     "exclude": [
         "node_modules",
         "dist"

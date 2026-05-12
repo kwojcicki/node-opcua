@@ -22,18 +22,18 @@
 /**
  * @module node-opcua-client-browser
  *
- * Browser entry point for `node-opcua-client`. This initial scaffold ships the
- * package layout, build toolchain, and Playwright smoke harness. Later PRs add:
- *
- *   - The WebSocket transport (`ClientWS_transport`,
- *     `browserWsTransportFactory`) over OPC UA Part 6 §7.5 framing.
- *   - `createBrowserClient(...)` pre-wired with in-memory credentials and a
- *     browser-safe trust store.
- *   - Re-exports of the full `OPCUAClient` / `ClientSession` /
- *     `ClientSubscription` / `ClientMonitoredItem` surface.
- *   - An `esbuild`-produced standalone browser bundle.
+ * Browser entry point for `node-opcua-client`. Currently exposes the OPC UA
+ * WebSocket transport (`ClientWS_transport`, `browserWsTransportFactory`,
+ * `parseWsEndpointUrl`). Later PRs add a `createBrowserClient()` helper and a
+ * prebuilt standalone browser bundle.
  *
  * Target environments: modern evergreen browsers (Chromium, Firefox, WebKit).
+ * The transport uses the OPC UA WebSocket mapping per Part 6 §7.5
+ * (`opcua+uacp` subprotocol, one UACP chunk per binary frame).
  */
 
-export const VERSION = "2.170.1";
+export * from "./client_ws_transport";
+export * as uacp from "./uacp";
+export { WsSocketAdapter, type WebSocketLike } from "./ws_socket_adapter";
+
+export const VERSION = "2.171.0";

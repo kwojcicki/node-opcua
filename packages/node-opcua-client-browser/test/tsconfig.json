@@ -8,6 +8,7 @@
     },
     "include": [
         "e2e/**/*.ts",
-        "page/**/*.ts"
+        "page/**/*.ts",
+        "unit/**/*.ts"
     ]
 }
