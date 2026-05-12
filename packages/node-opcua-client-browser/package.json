@@ -19,15 +19,23 @@
         "build": "tsc -b && tsc -p tsconfig.esm.json",
         "build:test-page": "node build-test-page.mjs",
         "lint": "eslint source test",
+        "test:unit": "mocha 'test/unit/**/*.ts'",
         "test:e2e": "playwright test",
-        "test": "pnpm test:e2e",
+        "test": "pnpm test:unit && pnpm test:e2e",
         "test:check": "tsc --noEmit -p test/tsconfig.json",
         "clean": "npx rimraf -g node_modules dist dist-esm test/page/dist *.tsbuildinfo test-results playwright-report"
     },
-    "dependencies": {},
+    "dependencies": {
+        "node-opcua-assert": "2.164.0",
+        "node-opcua-debug": "2.171.0",
+        "node-opcua-status-code": "2.171.0",
+        "node-opcua-transport": "2.171.0"
+    },
     "devDependencies": {
         "@playwright/test": "^1.60.0",
-        "esbuild": "^0.28.0"
+        "@types/ws": "^8.5.13",
+        "esbuild": "^0.28.0",
+        "ws": "^8.18.0"
     },
     "author": "Sterfive SAS",
     "license": "MIT",
