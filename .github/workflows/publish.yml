@@ -39,8 +39,12 @@ jobs:
           key: ${{ runner.os }}-pnpm-store
 
       - name: Install pnpm
-        run: npm install -g pnpm
-
+        run: 
+          npm install -g pnpm
+          
+      - name: check pnpm version
+        run:  pnpm --version
+        
       - name: Install dependencies
         run: pnpm recursive install --no-frozen-lockfile
 
