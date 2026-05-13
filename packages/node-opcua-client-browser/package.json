@@ -26,8 +26,8 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@playwright/test": "^1.49.0",
-        "esbuild": "^0.25.0"
+        "@playwright/test": "^1.60.0",
+        "esbuild": "^0.28.0"
     },
     "author": "Sterfive SAS",
     "license": "MIT",
