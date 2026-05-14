@@ -8,8 +8,8 @@ packages:
   # all packages in subdirs of components/
   # - 'packages_extra/*'
 
-# pnpm 11 ignores install scripts of native packages by default;
-# this list explicitly allow-lists those we trust to run.
+  # pnpm 11 ignores install scripts of native packages by default;
+  # this list explicitly allow-lists those we trust to run.
 onlyBuiltDependencies:
   - esbuild
 
@@ -19,3 +19,6 @@ onlyBuiltDependencies:
 # packages like @sterfive/fix-tsconfigs or unpublished version bumps.
 # (The same setting was in .npmrc but pnpm 11 doesn't honor it from there.)
 linkWorkspacePackages: true
+
+allowBuilds:
+  esbuild: false
