@@ -1,6 +1,6 @@
 {
     "name": "node-opcua-packet-assembler",
-    "version": "2.171.0",
+    "version": "2.172.0",
     "description": "pure nodejs OPCUA SDK - module packet-assembler",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -14,7 +14,7 @@
     "license": "MIT",
     "dependencies": {
         "node-opcua-assert": "2.164.0",
-        "node-opcua-debug": "2.171.0"
+        "node-opcua-debug": "2.172.0"
     },
     "repository": {
         "type": "git",
