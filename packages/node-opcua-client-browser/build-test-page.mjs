@@ -1,16 +1,20 @@
 /**
  * Build the smoke-test page for the Playwright harness.
  *
- * Produces `test/page/dist/{index.html, main.js}` from `test/page/main.ts`
- * using a minimal esbuild config. The smoke page only verifies the bundler
- * wiring end-to-end; later PRs will introduce a fuller build configuration
- * (shared with the production browser bundle) in `esbuild-config.mjs`.
+ * Produces `test/page/dist/{index.html, main.js}` from `test/page/main.ts`,
+ * spreading the shared `browserBuildDefaults` from `./esbuild-config.mjs`
+ * so the bundler picks up the alias table and shims that route every
+ * Node-only import (`node:net`, `node:fs`, `node:os`, `node:events`, ...)
+ * to a browser-safe stub or browserify polyfill. The shared config is the
+ * same one `build-browser-bundle.mjs` will consume in a follow-up PR.
  */
 
 import * as esbuild from "esbuild";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mkdirSync, copyFileSync } from "node:fs";
+
+import { browserBuildDefaults } from "./esbuild-config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pageDir = resolve(__dirname, "test", "page");
@@ -23,12 +27,9 @@ export async function buildTestPage(opts = {}) {
     copyFileSync(resolve(pageDir, "index.html"), resolve(outDir, "index.html"));
 
     await esbuild.build({
+        ...browserBuildDefaults,
         entryPoints: [resolve(pageDir, "main.ts")],
         outfile: resolve(outDir, "main.js"),
-        bundle: true,
-        format: "esm",
-        platform: "browser",
-        target: "es2022",
         minify: false,
         sourcemap: opts.sourcemap ?? true,
         logLevel: opts.logLevel ?? "warning"
