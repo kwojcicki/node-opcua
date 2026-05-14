@@ -33,9 +33,9 @@
     },
     "devDependencies": {
         "@playwright/test": "^1.60.0",
-        "@types/ws": "^8.5.13",
+        "@types/ws": "^8.18.1",
         "esbuild": "^0.28.0",
-        "ws": "^8.18.0"
+        "ws": "^8.20.1"
     },
     "author": "Sterfive SAS",
     "license": "MIT",
